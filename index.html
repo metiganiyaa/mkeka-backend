@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>MKEKA | Live Odds & Multi-Bet</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0e17 0%, #0f1420 100%);
+            color: #ffffff;
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(90deg, #0f1722, #0a0e17);
+            padding: 16px 20px;
+            border-bottom: 3px solid #f0b90b;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .logo {
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+        }
+        .logo-main {
+            font-size: 2rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #f0b90b, #ffd54f);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -1px;
+        }
+        .logo-sub {
+            font-size: 0.7rem;
+            color: #f0b90b;
+            letter-spacing: 2px;
+        }
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0,230,118,0.15);
+            padding: 6px 14px;
+            border-radius: 40px;
+            backdrop-filter: blur(10px);
+        }
+        .pulse {
+            width: 8px;
+            height: 8px;
+            background: #00e676;
+            border-radius: 50%;
+            animation: pulse 1s infinite;
+            box-shadow: 0 0 8px #00e676;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.3); }
+        }
+        .whatsapp-btn {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            padding: 8px 20px;
+            border-radius: 40px;
+            text-decoration: none;
+            color: white;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s;
+        }
+        .whatsapp-btn:hover {
+            transform: scale(1.02);
+        }
+
+        /* Main Layout */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(240,185,11,0.05), rgba(0,0,0,0));
+            border-radius: 32px;
+        }
+        .hero h1 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+        .hero h1 span {
+            color: #f0b90b;
+        }
+        .hero p {
+            color: #a8b3cf;
+        }
+
+        /* Sports Filter */
+        .sports-filter {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding: 12px 0;
+            margin-bottom: 20px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+        }
+        .sport-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 10px 24px;
+            border-radius: 40px;
+            cursor: pointer;
+            color: #e8edf5;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+        .sport-btn.active {
+            background: linear-gradient(135deg, #f0b90b, #e6a800);
+            color: #0a0e17;
+            border-color: #f0b90b;
+            box-shadow: 0 4px 15px rgba(240,185,11,0.3);
+        }
+
+        /* Games Grid */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 18px;
+        }
+
+        .game-card {
+            background: linear-gradient(135deg, #121826, #0f1420);
+            border-radius: 24px;
+            border: 1px solid rgba(240,185,11,0.12);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .game-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(240,185,11,0.4);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        .game-header {
+            padding: 14px 16px;
+            background: rgba(0,0,0,0.4);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+        }
+        .league {
+            color: #f0b90b;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .time {
+            color: #7f8aa8;
+        }
+        .teams {
+            padding: 20px 16px;
+            text-align: center;
+        }
+        .home-team, .away-team {
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+        .vs {
+            color: #f0b90b;
+            font-size: 0.7rem;
+            margin: 10px 0;
+            letter-spacing: 3px;
+            font-weight: 700;
+        }
+        .odds-row {
+            display: flex;
+            justify-content: space-around;
+            padding: 14px 16px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            gap: 12px;
+        }
+        .odds-box {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 16px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .odds-box:hover {
+            background: rgba(240,185,11,0.15);
+        }
+        .odds-box.selected {
+            background: linear-gradient(135deg, #f0b90b, #e6a800);
+            color: #0a0e17;
+            box-shadow: 0 4px 12px rgba(240,185,11,0.3);
+        }
+        .odds-label {
+            font-size: 0.65rem;
+            opacity: 0.8;
+            margin-bottom: 4px;
+        }
+        .odds-value {
+            font-weight: 800;
+            font-size: 1.2rem;
+        }
+
+        /* Bet Slip */
+        .bet-slip {
+            background: linear-gradient(135deg, #1a1f30, #12172a);
+            border-radius: 28px;
+            padding: 20px;
+            margin-top: 30px;
+            border: 1px solid rgba(240,185,11,0.2);
+            position: sticky;
+            bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+        .bet-slip-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(240,185,11,0.2);
+        }
+        .bet-slip-header h3 {
+            font-size: 1.2rem;
+            color: #f0b90b;
+        }
+        .bet-count {
+            background: #f0b90b;
+            color: #0a0e17;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-weight: 800;
+            font-size: 0.85rem;
+        }
+        .selected-list {
+            max-height: 180px;
+            overflow-y: auto;
+            margin-bottom: 16px;
+        }
+        .selected-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            font-size: 0.85rem;
+        }
+        .remove-btn {
+            background: rgba(255,85,85,0.15);
+            border: none;
+            color: #ff5555;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .remove-btn:hover {
+            background: #ff5555;
+            color: white;
+        }
+        .total-odds {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            font-weight: 800;
+            font-size: 1.2rem;
+            border-top: 1px solid rgba(240,185,11,0.2);
+        }
+        .potential-win {
+            background: linear-gradient(135deg, rgba(0,230,118,0.1), rgba(0,230,118,0.02));
+            padding: 12px 16px;
+            border-radius: 20px;
+            margin: 12px 0;
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+        }
+        .stake-input {
+            width: 100%;
+            padding: 14px;
+            background: #0a0e17;
+            border: 1px solid rgba(240,185,11,0.3);
+            border-radius: 20px;
+            color: white;
+            font-size: 1rem;
+            margin: 12px 0;
+        }
+        .stake-input:focus {
+            outline: none;
+            border-color: #f0b90b;
+        }
+        .place-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #f0b90b, #e6a800);
+            border: none;
+            padding: 16px;
+            border-radius: 60px;
+            font-weight: 800;
+            color: #0a0e17;
+            cursor: pointer;
+            font-size: 1.1rem;
+            margin-top: 12px;
+            transition: transform 0.2s;
+        }
+        .place-btn:hover {
+            transform: scale(0.98);
+        }
+        .clear-btn {
+            background: rgba(255,85,85,0.15);
+            border: none;
+            color: #ff8888;
+            padding: 6px 14px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #7f8aa8;
+            font-size: 1.1rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            font-size: 0.7rem;
+            color: #5a657f;
+        }
+
+        @media (max-width: 700px) {
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+            .hero h1 {
+                font-size: 1.3rem;
+            }
+            .logo-main {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-content">
+        <div class="logo">
+            <div class="logo-main">MKEKA</div>
+            <div class="logo-sub">BETTING HUB</div>
+        </div>
+        <div class="live-badge">
+            <div class="pulse"></div>
+            <span>🔥 LIVE ODDS</span>
+        </div>
+        <a href="https://wa.me/255725214592" class="whatsapp-btn">💬 WHATSAPP AGENT</a>
+    </div>
+</div>
+
+<div class="main-container">
+    <div class="hero">
+        <h1>KARIBU <span>MKEKA</span> 🎲</h1>
+        <p>Chagua timu, jenga multi-bet, wasiliana nasi kuweka dau</p>
+        <p style="font-size:0.8rem; margin-top:8px;">⚡ Live odds from NBA | NFL | EPL | MLB ⚡</p>
+    </div>
+
+    <div class="sports-filter" id="sportsFilter">
+        <button class="sport-btn active" data-sport="all">🏆 ZOTE</button>
+        <button class="sport-btn" data-sport="basketball_nba">🏀 NBA</button>
+        <button class="sport-btn" data-sport="americanfootball_nfl">🏈 NFL</button>
+        <button class="sport-btn" data-sport="soccer_epl">⚽ EPL</button>
+        <button class="sport-btn" data-sport="baseball_mlb">⚾ MLB</button>
+    </div>
+
+    <div id="gamesContainer" class="games-grid">
+        <div class="loading">📡 Loading live odds...</div>
+    </div>
+
+    <div class="bet-slip" id="betSlip">
+        <div class="bet-slip-header">
+            <h3>📋 SLIP YANGU</h3>
+            <div>
+                <button class="clear-btn" id="clearAllBtn">Futa Zote</button>
+                <span class="bet-count" id="betCount">0</span>
+            </div>
+        </div>
+        <div id="selectedList" class="selected-list">
+            <div style="text-align:center; color:#5a657f; padding:20px;">Bonyeza odds kuongeza</div>
+        </div>
+        <div class="total-odds">
+            <span>📊 Jumla ya Odds:</span>
+            <span id="totalOddsDisplay" style="color:#f0b90b;">0.00</span>
+        </div>
+        <div class="potential-win">
+            <span>💰 Ushindi Unaowezekana:</span>
+            <span id="potentialWin" style="color:#00e676;">0 TZS</span>
+        </div>
+        <input type="number" id="stakeInput" class="stake-input" placeholder="Weka Kiasi (TZS)" value="5000">
+        <button class="place-btn" id="placeBetBtn">🎲 WASILIANA KUPITIA WHATSAPP 🎲</button>
+    </div>
+
+    <footer>
+        <p>📍 MKEKA Betting Hub — Dar es Salaam Office | Msaada wa 24/7</p>
+        <p style="margin-top:8px;">© 2026 MKEKA | Odds zinazobadilika kila dakika</p>
+    </footer>
+</div>
+
+<script>
+    let currentSport = 'all';
+    let allGames = [];
+    let selectedBets = [];
+
+    async function fetchOdds() {
+        try {
+            const response = await fetch('http://localhost:5050/api/odds');
+            allGames = await response.json();
+            renderGames();
+        } catch (error) {
+            document.getElementById('gamesContainer').innerHTML = '<div class="loading">⚠️ Server imelala. Anzisha: node server.js</div>';
+        }
+    }
+
+    function renderGames() {
+        let filtered = allGames;
+        if (currentSport !== 'all') {
+            filtered = allGames.filter(game => game.sport_key === currentSport);
+        }
+
+        if (filtered.length === 0) {
+            document.getElementById('gamesContainer').innerHTML = '<div class="loading">Hakuna mechi kwa sasa</div>';
+            return;
+        }
+
+        document.getElementById('gamesContainer').innerHTML = filtered.map(game => {
+            const bookmaker = game.bookmakers[0];
+            const market = bookmaker?.markets[0];
+            const homeOdds = market?.outcomes.find(o => o.name === game.home_team)?.price || 'N/A';
+            const awayOdds = market?.outcomes.find(o => o.name === game.away_team)?.price || 'N/A';
+            const gameId = game.id;
+            const isHomeSelected = selectedBets.some(b => b.gameId === gameId && b.type === 'home');
+            const isAwaySelected = selectedBets.some(b => b.gameId === gameId && b.type === 'away');
+            const gameTime = new Date(game.commence_time).toLocaleString();
+
+            return `
+                <div class="game-card">
+                    <div class="game-header">
+                        <span class="league">${game.sport_key.toUpperCase().replace('_', ' ')}</span>
+                        <span class="time">🕐 ${gameTime}</span>
+                    </div>
+                    <div class="teams">
+                        <div class="home-team">🏠 ${game.home_team}</div>
+                        <div class="vs">⚡ VS ⚡</div>
+                        <div class="away-team">✈️ ${game.away_team}</div>
+                    </div>
+                    <div class="odds-row">
+                        <div class="odds-box ${isHomeSelected ? 'selected' : ''}" onclick="toggleBet('${gameId}', 'home', '${game.home_team}', ${homeOdds}, '${game.sport_key}')">
+                            <div class="odds-label">${game.home_team}</div>
+                            <div class="odds-value">${homeOdds}</div>
+                        </div>
+                        <div class="odds-box ${isAwaySelected ? 'selected' : ''}" onclick="toggleBet('${gameId}', 'away', '${game.away_team}', ${awayOdds}, '${game.sport_key}')">
+                            <div class="odds-label">${game.away_team}</div>
+                            <div class="odds-value">${awayOdds}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function toggleBet(gameId, type, teamName, odds, league) {
+        const existingIndex = selectedBets.findIndex(b => b.gameId === gameId && b.type === type);
+        if (existingIndex !== -1) {
+            selectedBets.splice(existingIndex, 1);
+        } else {
+            selectedBets.push({ gameId, type, teamName, odds, league });
+        }
+        updateBetSlip();
+        renderGames();
+    }
+
+    function updateBetSlip() {
+        document.getElementById('betCount').innerText = selectedBets.length;
+        const container = document.getElementById('selectedList');
+        
+        if (selectedBets.length === 0) {
+            container.innerHTML = '<div style="text-align:center; color:#5a657f; padding:20px;">Bonyeza odds kuongeza</div>';
+            document.getElementById('totalOddsDisplay').innerText = '0.00';
+            document.getElementById('potentialWin').innerText = '0 TZS';
+            return;
+        }
+
+        let totalOdds = 1;
+        selectedBets.forEach(bet => { totalOdds *= bet.odds; });
+        totalOdds = totalOdds.toFixed(2);
+        
+        const stake = parseFloat(document.getElementById('stakeInput').value) || 0;
+        const win = (stake * totalOdds).toFixed(0);
+        
+        document.getElementById('totalOddsDisplay').innerText = totalOdds;
+        document.getElementById('potentialWin').innerHTML = `${parseInt(win).toLocaleString()} TZS`;
+        
+        container.innerHTML = selectedBets.map(bet => `
+            <div class="selected-item">
+                <span>🎲 ${bet.teamName} @ ${bet.odds}</span>
+                <button class="remove-btn" onclick="removeBet('${bet.gameId}', '${bet.type}')">✖</button>
+            </div>
+        `).join('');
+    }
+
+    function removeBet(gameId, type) {
+        selectedBets = selectedBets.filter(b => !(b.gameId === gameId && b.type === type));
+        updateBetSlip();
+        renderGames();
+    }
+
+    function clearAllBets() {
+        selectedBets = [];
+        updateBetSlip();
+        renderGames();
+    }
+
+    function placeBet() {
+        if (selectedBets.length === 0) {
+            alert('Tafadhali chagua angalau odds moja');
+            return;
+        }
+        const stake = document.getElementById('stakeInput').value;
+        if (!stake || stake <= 0) {
+            alert('Weka kiasi sahihi (TZS)');
+            return;
+        }
+        
+        let totalOdds = 1;
+        selectedBets.forEach(bet => { totalOdds *= bet.odds; });
+        const win = stake * totalOdds;
+        
+        let message = `🎲 MKEKA MULTI-BET 🎲\n\n`;
+        message += `📋 Selections (${selectedBets.length}):\n`;
+        selectedBets.forEach((bet, i) => {
+            message += `${i+1}. ${bet.teamName} @ ${bet.odds}\n`;
+        });
+        message += `\n💰 Kiasi: ${parseInt(stake).toLocaleString()} TZS`;
+        message += `\n📊 Total Odds: ${totalOdds.toFixed(2)}`;
+        message += `\n🏆 Ushindi: ${parseInt(win).toLocaleString()} TZS`;
+        message += `\n\n📞 Tumia code: MKEKA2025`;
+        message += `\n📍 MKEKA Betting Hub - Dar es Salaam`;
+        
+        window.open(`https://wa.me/254725214592?text=${encodeURIComponent(message)}`, '_blank');
+    }
+
+    document.getElementById('stakeInput').addEventListener('input', () => updateBetSlip());
+    document.getElementById('clearAllBtn').addEventListener('click', clearAllBets);
+    document.getElementById('placeBetBtn').addEventListener('click', placeBet);
+    
+    document.querySelectorAll('.sport-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.sport-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentSport = btn.dataset.sport;
+            renderGames();
+        });
+    });
+
+    window.toggleBet = toggleBet;
+    window.removeBet = removeBet;
+    
+    fetchOdds();
+    setInterval(fetchOdds, 60000);
+</script>
+</body>
+</html>
